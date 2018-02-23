@@ -1,0 +1,7 @@
+C:\Users\wspir\source\repos\MailSend\MailSend\bin\Debug\MailSend.exe.config
+C:\Users\wspir\source\repos\MailSend\MailSend\bin\Debug\MailSend.exe
+C:\Users\wspir\source\repos\MailSend\MailSend\bin\Debug\MailSend.pdb
+C:\Users\wspir\source\repos\MailSend\MailSend\obj\Debug\MailSend.csprojResolveAssemblyReference.cache
+C:\Users\wspir\source\repos\MailSend\MailSend\obj\Debug\MailSend.csproj.CoreCompileInputs.cache
+C:\Users\wspir\source\repos\MailSend\MailSend\obj\Debug\MailSend.exe
+C:\Users\wspir\source\repos\MailSend\MailSend\obj\Debug\MailSend.pdb
